@@ -487,6 +487,7 @@ class DamUpliftConditionLoadProcess : public Process
                 }
                 it_elem->SetValuesOnIntegrationPoints(UPLIFT_PRESSURE,UpliftPressureVector,CurrentProcessInfo);
             }
+            KRATOS_WATCH(JointPosition)
         }
 
         // if (nnodes != 0)
