@@ -247,14 +247,27 @@ class DamUpliftConditionLoadProcess : public Process
 
                     double UpliftPressure = 0.0;
 
-                    if (MyGaussPoint.StateVariable == 0.0)
+                    if (MyGaussPoint.StateVariable == 0.0) // Broken part
                     {
                         UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])));
                     }
-
-                    else
+                    else // Not broken part
                     {
-                        UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - JointPosition)) * (fabs(newCoordinate(0) - (reference_vector(0) - JointPosition)))));
+                        if (mDrain == true && JointPosition < (reference_vector(0) + mDistanceDrain))
+                        {
+                            if (newCoordinate(0) < (reference_vector(0) + mDistanceDrain))
+                            {
+                                UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - 0.8 * ((1.0 / ((reference_vector(0) + mDistanceDrain) - JointPosition)) * (fabs(newCoordinate(0) - JointPosition))));
+                            }
+                            else
+                            {
+                                UpliftPressure = 0.2 * GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - mDistanceDrain)) * (fabs(newCoordinate(0) - (reference_vector(0) + mDistanceDrain)))));
+                            }
+                        }
+                        else
+                        {
+                            UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - (JointPosition - reference_vector(0)))) * (fabs(newCoordinate(0) - JointPosition))));
+                        }
                     }
 
                     if (UpliftPressure < 0.0)
@@ -467,14 +480,27 @@ class DamUpliftConditionLoadProcess : public Process
 
                     double UpliftPressure = 0.0;
 
-                    if (MyGaussPoint.StateVariable == 0.0)
+                    if (MyGaussPoint.StateVariable == 0.0) // Broken part
                     {
                         UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])));
                     }
-
-                    else
+                    else // Not broken part
                     {
-                        UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - JointPosition)) * (fabs(newCoordinate(0) - (reference_vector(0) - JointPosition)))));
+                        if (mDrain == true && JointPosition < (reference_vector(0) + mDistanceDrain))
+                        {
+                            if (newCoordinate(0) < (reference_vector(0) + mDistanceDrain))
+                            {
+                                UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - 0.8 * ((1.0 / ((reference_vector(0) + mDistanceDrain) - JointPosition)) * (fabs(newCoordinate(0) - JointPosition))));
+                            }
+                            else
+                            {
+                                UpliftPressure = 0.2 * GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - mDistanceDrain)) * (fabs(newCoordinate(0) - (reference_vector(0) + mDistanceDrain)))));
+                            }
+                        }
+                        else
+                        {
+                            UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - (JointPosition - reference_vector(0)))) * (fabs(newCoordinate(0) - JointPosition))));
+                        }
                     }
 
                     if (UpliftPressure < 0.0)
