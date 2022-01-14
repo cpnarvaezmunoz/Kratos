@@ -243,13 +243,11 @@ class DamUpliftConditionLoadProcess : public Process
 
                     newCoordinate = prod(RotationMatrix, auxiliar_vector);
 
-                    double GP_Weight = detJContainer[GPoint]*IntegrationPoints[GPoint].Weight();
-
                     double UpliftPressure = 0.0;
 
                     if (MyGaussPoint.StateVariable == 0.0) // Broken part
                     {
-                        UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])));
+                        UpliftPressure =  mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]));
                     }
                     else // Not broken part
                     {
@@ -257,16 +255,16 @@ class DamUpliftConditionLoadProcess : public Process
                         {
                             if (newCoordinate(0) < (reference_vector(0) + mDistanceDrain))
                             {
-                                UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - 0.8 * ((1.0 / ((reference_vector(0) + mDistanceDrain) - JointPosition)) * (fabs(newCoordinate(0) - JointPosition))));
+                                UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - 0.8 * ((1.0 / ((reference_vector(0) + mDistanceDrain) - JointPosition)) * (fabs(newCoordinate(0) - JointPosition))));
                             }
                             else
                             {
-                                UpliftPressure = 0.2 * GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - mDistanceDrain)) * (fabs(newCoordinate(0) - (reference_vector(0) + mDistanceDrain)))));
+                                UpliftPressure = 0.2 * mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - ((1.0 / (mBaseDam - mDistanceDrain)) * (fabs(newCoordinate(0) - (reference_vector(0) + mDistanceDrain)))));
                             }
                         }
                         else
                         {
-                            UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - (JointPosition - reference_vector(0)))) * (fabs(newCoordinate(0) - JointPosition))));
+                            UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - ((1.0 / (mBaseDam - (JointPosition - reference_vector(0)))) * (fabs(newCoordinate(0) - JointPosition))));
                         }
                     }
 
@@ -476,13 +474,11 @@ class DamUpliftConditionLoadProcess : public Process
 
                     newCoordinate = prod(RotationMatrix, auxiliar_vector);
 
-                    double GP_Weight = detJContainer[GPoint]*IntegrationPoints[GPoint].Weight();
-
                     double UpliftPressure = 0.0;
 
                     if (MyGaussPoint.StateVariable == 0.0) // Broken part
                     {
-                        UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])));
+                        UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]));
                     }
                     else // Not broken part
                     {
@@ -490,16 +486,16 @@ class DamUpliftConditionLoadProcess : public Process
                         {
                             if (newCoordinate(0) < (reference_vector(0) + mDistanceDrain))
                             {
-                                UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - 0.8 * ((1.0 / ((reference_vector(0) + mDistanceDrain) - JointPosition)) * (fabs(newCoordinate(0) - JointPosition))));
+                                UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - 0.8 * ((1.0 / ((reference_vector(0) + mDistanceDrain) - JointPosition)) * (fabs(newCoordinate(0) - JointPosition))));
                             }
                             else
                             {
-                                UpliftPressure = 0.2 * GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - mDistanceDrain)) * (fabs(newCoordinate(0) - (reference_vector(0) + mDistanceDrain)))));
+                                UpliftPressure = 0.2 * mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - ((1.0 / (mBaseDam - mDistanceDrain)) * (fabs(newCoordinate(0) - (reference_vector(0) + mDistanceDrain)))));
                             }
                         }
                         else
                         {
-                            UpliftPressure = GP_Weight * (mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]))) * (1.0 - ((1.0 / (mBaseDam - (JointPosition - reference_vector(0)))) * (fabs(newCoordinate(0) - JointPosition))));
+                            UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - ((1.0 / (mBaseDam - (JointPosition - reference_vector(0)))) * (fabs(newCoordinate(0) - JointPosition))));
                         }
                     }
 
