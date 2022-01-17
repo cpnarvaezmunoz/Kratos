@@ -144,6 +144,16 @@ class DamUpliftConditionLoadProcess : public Process
         // const int nnodes = mrModelPart.GetMesh(0).Nodes().size();
         BoundedMatrix<double, 3, 3> RotationMatrix;
 
+        // Getting the values of table in case that it exist
+        if (mTableId != 0)
+        {
+            double time = mrModelPart.GetProcessInfo()[TIME];
+            time = time / mTimeUnitConverter;
+            mWaterLevel = mpTable->GetValue(time);
+        }
+
+        // && mrModelPart.GetProcessInfo()[TIME] >= 1.0
+
         // Computing the rotation matrix accoding with the introduced points by the user
         this->CalculateRotationMatrix(RotationMatrix);
         array_1d<double, 3> newCoordinate;
@@ -211,7 +221,7 @@ class DamUpliftConditionLoadProcess : public Process
                 }
             }
 
-             for(int j = 0; j < nelems; j++)
+            for(int j = 0; j < nelems; j++)
             {
                 ModelPart::ElementsContainerType::iterator it_elem = el_begin + j;
 
@@ -247,22 +257,22 @@ class DamUpliftConditionLoadProcess : public Process
 
                     if (MyGaussPoint.StateVariable == 0.0) // Broken part
                     {
-                        UpliftPressure =  mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]));
+                        UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]));
                     }
                     else // Not broken part
                     {
-                        if (mDrain == true && JointPosition < (reference_vector(0) + mDistanceDrain))
+                        if (mDrain == true && JointPosition < (reference_vector(0) + mDistanceDrain)) // If Drain and Joint broken less than the Drain
                         {
-                            if (newCoordinate(0) < (reference_vector(0) + mDistanceDrain))
+                            if (newCoordinate(0) < (reference_vector(0) + mDistanceDrain)) // UpliftPressure before the Drain
                             {
                                 UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - 0.8 * ((1.0 / ((reference_vector(0) + mDistanceDrain) - JointPosition)) * (fabs(newCoordinate(0) - JointPosition))));
                             }
-                            else
+                            else // UpliftPressure after the Drain
                             {
                                 UpliftPressure = 0.2 * mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - ((1.0 / (mBaseDam - mDistanceDrain)) * (fabs(newCoordinate(0) - (reference_vector(0) + mDistanceDrain)))));
                             }
                         }
-                        else
+                        else // If Not Drain or Joint broken more than the Drain
                         {
                             UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - ((1.0 / (mBaseDam - (JointPosition - reference_vector(0)))) * (fabs(newCoordinate(0) - JointPosition))));
                         }
@@ -274,10 +284,11 @@ class DamUpliftConditionLoadProcess : public Process
                     }
 
                     // GaussPoint StateVariable and Damage
-                    UpliftPressureVector[GPoint] = UpliftPressure;
+                    UpliftPressureVector[GPoint] = 2.0 * UpliftPressure;
                 }
                 it_elem->SetValuesOnIntegrationPoints(UPLIFT_PRESSURE,UpliftPressureVector,CurrentProcessInfo);
             }
+            KRATOS_WATCH(JointPosition)
         }
 
         // if (nnodes != 0)
@@ -482,18 +493,18 @@ class DamUpliftConditionLoadProcess : public Process
                     }
                     else // Not broken part
                     {
-                        if (mDrain == true && JointPosition < (reference_vector(0) + mDistanceDrain))
+                        if (mDrain == true && JointPosition < (reference_vector(0) + mDistanceDrain)) // If Drain and Joint broken less than the Drain
                         {
-                            if (newCoordinate(0) < (reference_vector(0) + mDistanceDrain))
+                            if (newCoordinate(0) < (reference_vector(0) + mDistanceDrain)) // UpliftPressure before the Drain
                             {
                                 UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - 0.8 * ((1.0 / ((reference_vector(0) + mDistanceDrain) - JointPosition)) * (fabs(newCoordinate(0) - JointPosition))));
                             }
-                            else
+                            else // UpliftPressure after the Drain
                             {
                                 UpliftPressure = 0.2 * mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - ((1.0 / (mBaseDam - mDistanceDrain)) * (fabs(newCoordinate(0) - (reference_vector(0) + mDistanceDrain)))));
                             }
                         }
-                        else
+                        else // If Not Drain or Joint broken more than the Drain
                         {
                             UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction])) * (1.0 - ((1.0 / (mBaseDam - (JointPosition - reference_vector(0)))) * (fabs(newCoordinate(0) - JointPosition))));
                         }
@@ -505,7 +516,7 @@ class DamUpliftConditionLoadProcess : public Process
                     }
 
                     // GaussPoint StateVariable and Damage
-                    UpliftPressureVector[GPoint] = UpliftPressure;
+                    UpliftPressureVector[GPoint] = 2.0 * UpliftPressure;
                 }
                 it_elem->SetValuesOnIntegrationPoints(UPLIFT_PRESSURE,UpliftPressureVector,CurrentProcessInfo);
             }

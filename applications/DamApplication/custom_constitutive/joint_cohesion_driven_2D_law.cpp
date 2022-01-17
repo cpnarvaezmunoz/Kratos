@@ -78,7 +78,7 @@ void JointCohesionDriven2DLaw::ComputeConstitutiveMatrix(Matrix& rConstitutiveMa
 
 		if (mStateVariable == 0.0) // Broken joint
 		{
-			double broken_YieldStress = rVariables.YoungModulus * 1.0e-9;
+			double broken_YieldStress = 0.0;
 			rConstitutiveMatrix(0,0) = broken_YieldStress;
 			rConstitutiveMatrix(1,1) = rConstitutiveMatrix(0,0);
 			rConstitutiveMatrix(0,1) = 0.0;
@@ -101,7 +101,7 @@ void JointCohesionDriven2DLaw::ComputeConstitutiveMatrix(Matrix& rConstitutiveMa
 		{
 			double shear_modulus_stress = fabs(StrainVector[0] / (2.0 * (1.0 + rVariables.PoissonCoefficient)));
 			double friction_modulus_stress = fabs(rVariables.FrictionCoefficient * StrainVector[1]);
-			double broken_YieldStress = rVariables.YoungModulus * 1.0e-9;
+			double broken_YieldStress = 0.0;
 
 			if (shear_modulus_stress > friction_modulus_stress)
 			{
@@ -150,14 +150,14 @@ void JointCohesionDriven2DLaw::ComputeStressVector(Vector& rStressVector,
         if (mStateVariable == 1.0) // Unbroken joint
 		{
 			rStressVector[0] = rVariables.YoungModulus * StrainVector[0];
-			rStressVector[1] = rVariables.YoungModulus * StrainVector[1] - mUpliftPressure;
+			rStressVector[1] = rVariables.YoungModulus * StrainVector[1];
 		}
 
 		if (mStateVariable == 0.0) // Broken joint
 		{
-			double broken_YieldStress = rVariables.YoungModulus * 1.0e-9;
+			double broken_YieldStress = 0.0;
 			rStressVector[0] = broken_YieldStress * StrainVector[0];
-			rStressVector[1] = broken_YieldStress * StrainVector[1] - mUpliftPressure;
+			rStressVector[1] = broken_YieldStress * StrainVector[1];
 		}
     }
 
@@ -167,7 +167,7 @@ void JointCohesionDriven2DLaw::ComputeStressVector(Vector& rStressVector,
 		if (mStateVariable==1.0) // Unbroken joint
 		{
 			rStressVector[0] = rVariables.YoungModulus * StrainVector[0];
-			rStressVector[1] = rVariables.YoungModulus * StrainVector[1] - mUpliftPressure;
+			rStressVector[1] = rVariables.YoungModulus * StrainVector[1];
 		}
 
         if (mStateVariable==0.0) // Broken joint
@@ -177,7 +177,7 @@ void JointCohesionDriven2DLaw::ComputeStressVector(Vector& rStressVector,
 			double max_friction_stress = fabs(rVariables.FrictionCoefficient * rVariables.YoungModulus * StrainVector[1]);
 			if (friction_stress > max_friction_stress) friction_stress = max_friction_stress;
 
-			double broken_YieldStress = rVariables.YoungModulus * 1.0e-9;
+			double broken_YieldStress = 0.0;
 			const double eps = std::numeric_limits<double>::epsilon();
 			if(StrainVector[0] > eps)
 			{
@@ -191,9 +191,11 @@ void JointCohesionDriven2DLaw::ComputeStressVector(Vector& rStressVector,
 			{
 				rStressVector[0] = 0.0;
 			}
-			rStressVector[1] = rVariables.YoungModulus * StrainVector[1] - mUpliftPressure;
+			rStressVector[1] = rVariables.YoungModulus * StrainVector[1];
 		}
     }
+    // Add Uplift Pressure
+    rStressVector[1] -= mUpliftPressure;
 }
 
 } // Namespace Kratos
