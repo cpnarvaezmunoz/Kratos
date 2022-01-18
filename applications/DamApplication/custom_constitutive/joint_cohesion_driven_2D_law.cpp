@@ -43,7 +43,7 @@ void JointCohesionDriven2DLaw::ComputeEquivalentStrain(ConstitutiveLawVariables&
 	rVariables.EquivalentStrain = 1.0;
 
     double tau = rVariables.YoungModulus * StrainVector[0];
-	double sigma = rVariables.YoungModulus * StrainVector[1] + mUpliftPressure;
+	double sigma = rVariables.YoungModulus * StrainVector[1];
 
     if( rValues.GetOptions().Is(ConstitutiveLaw::COMPUTE_STRAIN_ENERGY) ) // No contact between interfaces
     {
