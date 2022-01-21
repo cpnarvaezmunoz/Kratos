@@ -197,43 +197,6 @@ class DamUpliftConditionLoadProcess : public Process
                 Vector detJContainer(NumGPoints);
                 rGeom.DeterminantOfJacobian(detJContainer,MyIntegrationMethod);
                 std::vector<double> StateVariableVector(NumGPoints);
-                it_elem->CalculateOnIntegrationPoints(STATE_VARIABLE,StateVariableVector,CurrentProcessInfo);
-
-                // Loop through GaussPoints
-                for ( unsigned int GPoint = 0; GPoint < NumGPoints; GPoint++ )
-                {
-                    // GaussPoint Coordinates
-                    AuxLocalCoordinates[0] = IntegrationPoints[GPoint][0];
-                    AuxLocalCoordinates[1] = IntegrationPoints[GPoint][1];
-                    AuxLocalCoordinates[2] = IntegrationPoints[GPoint][2];
-                    rGeom.GlobalCoordinates(MyGaussPoint.Coordinates,AuxLocalCoordinates); //Note: these are the CURRENT global coordinates
-
-                    // GaussPoint StateVariable (0 broken, 1 not broken)
-                    MyGaussPoint.StateVariable = StateVariableVector[GPoint];
-
-                    if (MyGaussPoint.StateVariable == 0)
-                    {
-                        if (MyGaussPoint.Coordinates[0] > JointPosition)
-                        {
-                            JointPosition = MyGaussPoint.Coordinates[0];
-                        }
-                    }
-                }
-            }
-
-            for(int j = 0; j < nelems; j++)
-            {
-                ModelPart::ElementsContainerType::iterator it_elem = el_begin + j;
-
-                Element::GeometryType& rGeom = it_elem->GetGeometry();
-                MyIntegrationMethod = GeometryData::IntegrationMethod::GI_GAUSS_1;
-                const Element::GeometryType::IntegrationPointsArrayType& IntegrationPoints = rGeom.IntegrationPoints(MyIntegrationMethod);
-                unsigned int NumGPoints = IntegrationPoints.size();
-                Vector detJContainer(NumGPoints);
-                rGeom.DeterminantOfJacobian(detJContainer,MyIntegrationMethod);
-                std::vector<double> StateVariableVector(NumGPoints);
-                it_elem->CalculateOnIntegrationPoints(STATE_VARIABLE,StateVariableVector,CurrentProcessInfo);
-
                 std::vector<double> UpliftPressureVector(NumGPoints);
 
                 // Loop through GaussPoints
@@ -245,7 +208,8 @@ class DamUpliftConditionLoadProcess : public Process
                     AuxLocalCoordinates[2] = IntegrationPoints[GPoint][2];
                     rGeom.GlobalCoordinates(MyGaussPoint.Coordinates,AuxLocalCoordinates); //Note: these are the CURRENT global coordinates
 
-                    // GaussPoint StateVariable (0 broken, 1 not broken)
+                    // Set GaussPoint StateVariable to 1 (not broken)
+                    StateVariableVector[GPoint] = 1;
                     MyGaussPoint.StateVariable = StateVariableVector[GPoint];
 
                     // GaussPoint Global Coordinates
@@ -255,7 +219,7 @@ class DamUpliftConditionLoadProcess : public Process
 
                     double UpliftPressure = 0.0;
 
-                    if (MyGaussPoint.StateVariable == 0.0) // Broken part
+                    if (MyGaussPoint.StateVariable < 1.0) // Broken part
                     {
                         UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]));
                     }
@@ -287,6 +251,7 @@ class DamUpliftConditionLoadProcess : public Process
                     UpliftPressureVector[GPoint] = 2.0 * UpliftPressure;
                 }
                 it_elem->SetValuesOnIntegrationPoints(UPLIFT_PRESSURE,UpliftPressureVector,CurrentProcessInfo);
+                it_elem->SetValuesOnIntegrationPoints(STATE_VARIABLE,StateVariableVector,CurrentProcessInfo);
             }
             KRATOS_WATCH(JointPosition)
         }
@@ -441,9 +406,10 @@ class DamUpliftConditionLoadProcess : public Process
                     rGeom.GlobalCoordinates(MyGaussPoint.Coordinates,AuxLocalCoordinates); //Note: these are the CURRENT global coordinates
 
                     // GaussPoint StateVariable (0 broken, 1 not broken)
-                    MyGaussPoint.StateVariable = StateVariableVector[GPoint];
+                    if (StateVariableVector.empty()) MyGaussPoint.StateVariable = 1;
+                    else MyGaussPoint.StateVariable = StateVariableVector[GPoint];
 
-                    if (MyGaussPoint.StateVariable == 0)
+                    if (MyGaussPoint.StateVariable < 1.0)
                     {
                         if (MyGaussPoint.Coordinates[0] > JointPosition)
                         {
@@ -478,7 +444,8 @@ class DamUpliftConditionLoadProcess : public Process
                     rGeom.GlobalCoordinates(MyGaussPoint.Coordinates,AuxLocalCoordinates); //Note: these are the CURRENT global coordinates
 
                     // GaussPoint StateVariable (0 broken, 1 not broken)
-                    MyGaussPoint.StateVariable = StateVariableVector[GPoint];
+                    if (StateVariableVector.empty()) MyGaussPoint.StateVariable = 1;
+                    else MyGaussPoint.StateVariable = StateVariableVector[GPoint];
 
                     // GaussPoint Global Coordinates
                     noalias(auxiliar_vector) = MyGaussPoint.Coordinates;
@@ -487,7 +454,7 @@ class DamUpliftConditionLoadProcess : public Process
 
                     double UpliftPressure = 0.0;
 
-                    if (MyGaussPoint.StateVariable == 0.0) // Broken part
+                    if (MyGaussPoint.StateVariable < 1.0) // Broken part
                     {
                         UpliftPressure = mSpecific * (ref_coord - (MyGaussPoint.Coordinates[direction]));
                     }
