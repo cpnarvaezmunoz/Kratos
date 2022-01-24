@@ -80,7 +80,7 @@ void JointCohesionDriven2DLaw::ComputeConstitutiveMatrix(Matrix& rConstitutiveMa
 
 		else // Broken joint
 		{
-			rConstitutiveMatrix(0,0) = 0.0;
+			rConstitutiveMatrix(0,0) = 1e-3 * rVariables.YoungModulus;
 			rConstitutiveMatrix(1,1) = rConstitutiveMatrix(0,0);
 			rConstitutiveMatrix(0,1) = 0.0;
 			rConstitutiveMatrix(1,0) = 0.0;
@@ -155,8 +155,8 @@ void JointCohesionDriven2DLaw::ComputeStressVector(Vector& rStressVector,
 
 		else // Broken joint
 		{
-			rStressVector[0] = 0.0;
-			rStressVector[1] = 0.0;
+			rStressVector[0] = 1e-3 * rVariables.YoungModulus * StrainVector[0];
+			rStressVector[1] = 1e-3 * rVariables.YoungModulus * StrainVector[1];
 		}
     }
 
