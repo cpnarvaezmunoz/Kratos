@@ -51,10 +51,13 @@ void JointCohesionDriven2DLaw::ComputeEquivalentStrain(ConstitutiveLawVariables&
 			double tau = rVariables.YoungModulus * StrainVector[0];
 			double sigma = rVariables.YoungModulus * StrainVector[1];
 
-		    double broken_limit = rVariables.FrictionCoefficient * (-rVariables.YoungModulus * StrainVector[1] + rVariables.Cohesion);
+			if (sigma > 0.0)
+			{
+		        double broken_limit = -rVariables.FrictionCoefficient * sigma + rVariables.Cohesion;
 
-		    if (sigma > rVariables.Cohesion) rVariables.EquivalentStrain = 0.0;
-		    // if (sigma > 0.0 && abs (tau) > broken_limit) rVariables.EquivalentStrain = 0.0;
+    		    if (sigma > rVariables.Cohesion) rVariables.EquivalentStrain = 0.0;
+	    	    if (abs (tau) > broken_limit) rVariables.EquivalentStrain = 0.0;
+			}
 		}
 	}
 }
