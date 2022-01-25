@@ -70,6 +70,8 @@ void JointCohesionDriven2DLaw::ComputeConstitutiveMatrix(Matrix& rConstitutiveMa
 {
     const Vector& StrainVector = rValues.GetStrainVector();
 
+	double broken_YieldStress = 1e-3 * rVariables.YoungModulus;
+
     if( rValues.GetOptions().Is(ConstitutiveLaw::COMPUTE_STRAIN_ENERGY) ) // No contact between interfaces
     {
         // Tensile constitutive matrix
@@ -83,7 +85,7 @@ void JointCohesionDriven2DLaw::ComputeConstitutiveMatrix(Matrix& rConstitutiveMa
 
 		else // Broken joint
 		{
-			rConstitutiveMatrix(0,0) = 1e-3 * rVariables.YoungModulus;
+			rConstitutiveMatrix(0,0) = broken_YieldStress;
 			rConstitutiveMatrix(1,1) = rConstitutiveMatrix(0,0);
 			rConstitutiveMatrix(0,1) = 0.0;
 			rConstitutiveMatrix(1,0) = 0.0;
@@ -147,6 +149,8 @@ void JointCohesionDriven2DLaw::ComputeStressVector(Vector& rStressVector,
 {
     const Vector& StrainVector = rValues.GetStrainVector();
 
+	double broken_YieldStress = 1e-3 * rVariables.YoungModulus;
+
     if( rValues.GetOptions().Is(ConstitutiveLaw::COMPUTE_STRAIN_ENERGY) ) // No contact between interfaces
     {
 		// Tensile stress
@@ -158,15 +162,15 @@ void JointCohesionDriven2DLaw::ComputeStressVector(Vector& rStressVector,
 
 		else // Broken joint
 		{
-			rStressVector[0] = 1e-3 * rVariables.YoungModulus * StrainVector[0];
-			rStressVector[1] = 1e-3 * rVariables.YoungModulus * StrainVector[1];
+			rStressVector[0] = broken_YieldStress * StrainVector[0];
+			rStressVector[1] = broken_YieldStress * StrainVector[1];
 		}
     }
 
     else // Contact between interfaces
     {
         // Note: StrainVector[1] < 0.0, rStressVector[1] < 0.0 -> Compresive stress
-		if (mStateVariable==1.0) // Unbroken joint
+		if (mStateVariable == 1.0) // Unbroken joint
 		{
 			rStressVector[0] = rVariables.YoungModulus * StrainVector[0];
 			rStressVector[1] = rVariables.YoungModulus * StrainVector[1];
