@@ -1,0 +1,31 @@
+Begin ModelPartData
+//  nothing here
+End ModelPartData
+
+
+Begin Properties 0            
+PERMITTIVITYPOS 3.0 // all the elements of the group 1 (second column in the list of elements) will have this property
+PERMITTIVITYNEG 1.0
+End Properties
+
+Begin Nodes
+       1        0.0        0.0         0.0     
+       2        1.0        0.0         0.0     
+       3        1.0        1.0         0.0     
+       4        0.0        1.0         0.0 
+End Nodes
+
+Begin Elements ElectricDistanceElement //here we must write the name of the element that we 
+  1 0 1 2 4
+  2 0 3 4 2 
+End Elements
+
+Begin NodalData SCHARGE         //be careful, variables are case sensitive!        
+End NodalData
+
+
+Begin NodalData EPOTENCIAL         //be careful, variables are case sensitive!
+1 1 1000   
+2 1 1000        
+End NodalData
+
