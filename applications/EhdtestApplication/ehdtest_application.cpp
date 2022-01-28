@@ -1,0 +1,71 @@
+//    |  /           |
+//    ' /   __| _` | __|  _ \   __|
+//    . \  |   (   | |   (   |\__ `
+//   _|\_\_|  \__,_|\__|\___/ ____/
+//                   Multi-Physics
+//
+//  License:         BSD License
+//                   Kratos default license: kratos/license.txt
+//
+//  Main authors:    @{KRATOS_APP_AUTHOR}
+//
+
+
+// System includes
+
+
+// External includes
+
+
+// Project includes
+#include "geometries/triangle_2d_3.h"
+#include "geometries/line_2d_2.h"
+#include "geometries/point_2d.h"
+#include "ehdtest_application.h"
+#include "ehdtest_application_variables.h"
+
+
+namespace Kratos {
+
+KratosEhdtestApplication::KratosEhdtestApplication():
+    KratosApplication("EhtestApplication"),
+    mElectricElement( 0, Element::GeometryType::Pointer( new Triangle2D3<Node<3>>( Element::GeometryType::PointsArrayType (3) ) ) ), 
+    mElectricDistanceElement( 0, Element::GeometryType::Pointer( new Triangle2D3<Node<3>>( Element::GeometryType::PointsArrayType (3) ) ) ), 
+    mElectricEnrichedElement( 0, Element::GeometryType::Pointer( new Triangle2D3<Node<3>>( Element::GeometryType::PointsArrayType (3) ) ) ), 
+    //mElectricEnrichedNElement( 0, Element::GeometryType::Pointer( new Triangle2D3<Node<3>>( Element::GeometryType::PointsArrayType (3) ) ) ), 
+    //mElectricEnrichedtElement( 0, Element::GeometryType::Pointer( new Triangle2D3<Node<3>>( Element::GeometryType::PointsArrayType (3) ) ) ), 
+
+    mPointChargeCondition( 0, Element::GeometryType::Pointer( new Point2D <Node<3> >(Element::GeometryType::PointsArrayType(1) ) ) ),   
+    mEfieldCondition( 0, Element::GeometryType::Pointer( new Line2D2<Node<3>>( Element::GeometryType::PointsArrayType (2) ) ) )
+    {}
+
+void KratosEhdtestApplication::Register()
+{
+     KRATOS_INFO("") << "Initializing KratosEhdtestApplication..." << std::endl;
+
+  KRATOS_REGISTER_VARIABLE( EPOTENCIAL )
+  KRATOS_REGISTER_VARIABLE( PERMITTIVITYPOS )
+  KRATOS_REGISTER_VARIABLE( PERMITTIVITYNEG )
+  KRATOS_REGISTER_VARIABLE( CONDUCTIVITYPOS )
+  KRATOS_REGISTER_VARIABLE( CONDUCTIVITYNEG )
+  KRATOS_REGISTER_VARIABLE( PCHARGE )
+  KRATOS_REGISTER_VARIABLE( SCHARGE )
+  KRATOS_REGISTER_VARIABLE( VCHARGE )
+  KRATOS_REGISTER_3D_VARIABLE_WITH_COMPONENTS( EFIELD )
+  KRATOS_REGISTER_3D_VARIABLE_WITH_COMPONENTS( EDISPLACEMENT )
+  KRATOS_REGISTER_3D_VARIABLE_WITH_COMPONENTS( EFORCE )
+  KRATOS_REGISTER_3D_VARIABLE_WITH_COMPONENTS( EFORCEPOS )
+  KRATOS_REGISTER_3D_VARIABLE_WITH_COMPONENTS( EFORCENEG )
+  KRATOS_REGISTER_VARIABLE( ICOEFFICIENT )
+
+  KRATOS_REGISTER_ELEMENT("ElectricElement", mElectricElement);
+  KRATOS_REGISTER_ELEMENT("ElectricDistanceElement", mElectricDistanceElement);
+  KRATOS_REGISTER_ELEMENT("ElectricEnrichedElement", mElectricEnrichedElement);
+  //KRATOS_REGISTER_ELEMENT("ElectricEnrichedNElement", mElectricEnrichedNElement);
+  //KRATOS_REGISTER_ELEMENT("ElectricEnrichedtElement", mElectricEnrichedtElement);
+  
+  KRATOS_REGISTER_CONDITION("EfieldCondition", mEfieldCondition);  
+  KRATOS_REGISTER_CONDITION("PointChargeCondition", mPointChargeCondition);
+
+}
+}  // namespace Kratos.
